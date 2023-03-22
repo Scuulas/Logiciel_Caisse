@@ -41,7 +41,6 @@ namespace Logiciel_Caisse
             this.panierLabel = new System.Windows.Forms.Label();
             this.montantLabel = new System.Windows.Forms.Label();
             this.MontantTextBox = new System.Windows.Forms.TextBox();
-            this.TicketButton = new System.Windows.Forms.Button();
             this.PayButton = new System.Windows.Forms.Button();
             this.DeleteButton = new System.Windows.Forms.Button();
             this.ArticleNumberComboBox = new System.Windows.Forms.ComboBox();
@@ -49,6 +48,7 @@ namespace Logiciel_Caisse
             this.n = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.article = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.price = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.amount = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.DeleteBasket = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.WeightUpDown)).BeginInit();
             this.SuspendLayout();
@@ -119,13 +119,7 @@ namespace Logiciel_Caisse
             // 
             // WeightUpDown
             // 
-            this.WeightUpDown.DecimalPlaces = 3;
             this.WeightUpDown.Enabled = false;
-            this.WeightUpDown.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
             this.WeightUpDown.Location = new System.Drawing.Point(215, 188);
             this.WeightUpDown.Margin = new System.Windows.Forms.Padding(4);
             this.WeightUpDown.Name = "WeightUpDown";
@@ -140,9 +134,9 @@ namespace Logiciel_Caisse
             this.panierLabel.Location = new System.Drawing.Point(383, 36);
             this.panierLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.panierLabel.Name = "panierLabel";
-            this.panierLabel.Size = new System.Drawing.Size(71, 20);
+            this.panierLabel.Size = new System.Drawing.Size(60, 20);
             this.panierLabel.TabIndex = 8;
-            this.panierLabel.Text = "PANIER :";
+            this.panierLabel.Text = "Basket:";
             // 
             // montantLabel
             // 
@@ -150,9 +144,9 @@ namespace Logiciel_Caisse
             this.montantLabel.Location = new System.Drawing.Point(484, 279);
             this.montantLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.montantLabel.Name = "montantLabel";
-            this.montantLabel.Size = new System.Drawing.Size(152, 16);
+            this.montantLabel.Size = new System.Drawing.Size(127, 16);
             this.montantLabel.TabIndex = 11;
-            this.montantLabel.Text = "MONTANT =                    €";
+            this.montantLabel.Text = " = Total Amount       €";
             // 
             // MontantTextBox
             // 
@@ -165,18 +159,6 @@ namespace Logiciel_Caisse
             this.MontantTextBox.TabIndex = 12;
             this.MontantTextBox.Text = "0";
             this.MontantTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // TicketButton
-            // 
-            this.TicketButton.Enabled = false;
-            this.TicketButton.Location = new System.Drawing.Point(383, 311);
-            this.TicketButton.Margin = new System.Windows.Forms.Padding(4);
-            this.TicketButton.Name = "TicketButton";
-            this.TicketButton.Size = new System.Drawing.Size(129, 39);
-            this.TicketButton.TabIndex = 16;
-            this.TicketButton.Text = "Open ticket";
-            this.TicketButton.UseVisualStyleBackColor = true;
-            this.TicketButton.Click += new System.EventHandler(this.TicketButton_Click);
             // 
             // PayButton
             // 
@@ -222,12 +204,13 @@ namespace Logiciel_Caisse
             this.PanierListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.n,
             this.article,
-            this.price});
+            this.price,
+            this.amount});
             this.PanierListView.HideSelection = false;
             this.PanierListView.Location = new System.Drawing.Point(383, 66);
             this.PanierListView.Margin = new System.Windows.Forms.Padding(4);
             this.PanierListView.Name = "PanierListView";
-            this.PanierListView.Size = new System.Drawing.Size(283, 203);
+            this.PanierListView.Size = new System.Drawing.Size(341, 203);
             this.PanierListView.TabIndex = 22;
             this.PanierListView.UseCompatibleStateImageBehavior = false;
             this.PanierListView.View = System.Windows.Forms.View.Details;
@@ -247,7 +230,13 @@ namespace Logiciel_Caisse
             // 
             this.price.Text = "price";
             this.price.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.price.Width = 71;
+            this.price.Width = 43;
+            // 
+            // amount
+            // 
+            this.amount.Text = "amount";
+            this.amount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.amount.Width = 71;
             // 
             // DeleteBasket
             // 
@@ -269,13 +258,12 @@ namespace Logiciel_Caisse
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(709, 373);
+            this.ClientSize = new System.Drawing.Size(772, 373);
             this.Controls.Add(this.DeleteBasket);
             this.Controls.Add(this.PanierListView);
             this.Controls.Add(this.ArticleNumberComboBox);
             this.Controls.Add(this.DeleteButton);
             this.Controls.Add(this.PayButton);
-            this.Controls.Add(this.TicketButton);
             this.Controls.Add(this.MontantTextBox);
             this.Controls.Add(this.montantLabel);
             this.Controls.Add(this.panierLabel);
@@ -288,11 +276,11 @@ namespace Logiciel_Caisse
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(727, 420);
+            this.MaximumSize = new System.Drawing.Size(790, 420);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(727, 420);
             this.Name = "Caisse";
-            this.Text = "Caisse";
+            this.Text = "Register";
             ((System.ComponentModel.ISupportInitialize)(this.WeightUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -311,7 +299,6 @@ namespace Logiciel_Caisse
         private Label panierLabel;
         private Label montantLabel;
         private TextBox MontantTextBox;
-        private Button TicketButton;
         private Button PayButton;
         private Button DeleteButton;
         private ComboBox ArticleNumberComboBox;
@@ -320,5 +307,6 @@ namespace Logiciel_Caisse
         private ColumnHeader article;
         private ColumnHeader price;
         private Button DeleteBasket;
+        private ColumnHeader amount;
     }
 }

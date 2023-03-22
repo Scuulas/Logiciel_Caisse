@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Controls;
 using System.Windows.Forms;
 
 namespace Logiciel_Caisse
@@ -10,18 +11,16 @@ namespace Logiciel_Caisse
     struct Article
     {
         public string name;
-        public double price_per_kg;
-        public double weight;
+        public int amount;
         public double price;
-        public double quantity;
+        public double totalprice;
 
-        public Article(string name, double price_per_kg, double weight, double price, double quantity)
+        public Article(string name ,double price, int amount, double totalprice)
         {
             this.name = name;
-            this.price_per_kg = price_per_kg;
-            this.weight = weight;
             this.price = price;
-            this.quantity = quantity;
+            this.amount = amount;
+            this.totalprice = totalprice;
         }
     }
 
@@ -32,14 +31,41 @@ namespace Logiciel_Caisse
         private double montant;                                                         // Montant total du panier
         private readonly Dictionary<int, Article> articles;                             // Structure pour contenir tous les articles dans le panier
         private int index;                                                              // Index: nombre d'articles dans le panier
-        private readonly FileInfo ticketFileToExport = new FileInfo(@"ticket.txt");     // Creation de la variable FileInfo pour pouvoir ecrire dans un fichier
-
+        private FileInfo ticketFileToExport;     // Creation de la variable FileInfo pour pouvoir ecrire dans un fichier
+        private Dictionary<string, int> articlesToExport;
         // Constructeur
         public Panier()
         {
+            DateTime now = DateTime.Today;
             this.montant = 0;
             this.index = 0;
             this.articles = new Dictionary<int, Article>();
+            this.articlesToExport = new Dictionary<string, int>();
+            this.ticketFileToExport = new FileInfo(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + ".csv");
+            if (!this.ticketFileToExport.Exists)
+            {
+                Directory.CreateDirectory(now.ToString("yyyy") + "\\" + now.ToString("MM"));    
+            }
+            else
+            {
+                try
+                {
+                    StreamReader reader = new StreamReader(this.ticketFileToExport.ToString());
+                    while (!reader.EndOfStream)
+                    {
+                        String line = reader.ReadLine();
+                        string[] temp = line.Split(';');
+                        this.articlesToExport.Add(temp[0], Convert.ToInt32(temp[1]));
+                    }
+                    reader.Close();
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("The file could not be read:");
+                    Console.WriteLine(e.Message);
+                }
+            }
         }
 
         // Getters des attributs montant et index
@@ -47,12 +73,11 @@ namespace Logiciel_Caisse
         public int GetIndex() { return this.index; }
 
         // Ajout d'un article dans le panier (le Dictionary articles), ajoute le prix au montant total et incremente this.index
-        public void AddArticle(string name, double price_per_kg, double weight, double quantity)
+        public void AddArticle(string name, double price, int amount)
         {
-            this.articles.Add(index, new Article(name, price_per_kg, Math.Round(weight, 2), Math.Round(weight * price_per_kg, 2), quantity));
-            this.montant += Math.Round(weight * price_per_kg, 2);
+            this.articles.Add(index, new Article(name, price, amount, Math.Round(amount * price, 2)));
+            this.montant += Math.Round(amount * price, 2);
             this.index++;
-            this.CreateTicketFile();        // MaJ du fichier ticket.txt
         }
 
         // Retourne une liste contenant tous les numeros des indexes d'un panier (pour le ComboBox)
@@ -74,7 +99,7 @@ namespace Logiciel_Caisse
         }
 
         // Met a jour l'objet PanierListView qui montre le contenu du panier
-        public void UpdateDisplay(ListView PanierListView)
+        public void UpdateDisplay(System.Windows.Forms.ListView PanierListView)
         {
             PanierListView.Items.Clear();                           // On vide la ListView
 
@@ -84,10 +109,11 @@ namespace Logiciel_Caisse
                 // Verification en theorie inutile mais en-cas ¯\_(ツ)_/¯
                 if (articles.ContainsKey(i))
                 {
-                    ListViewItem row = new ListViewItem();          // On instancie une ligne du tableau avec ListViewItem
+                    System.Windows.Forms.ListViewItem row = new System.Windows.Forms.ListViewItem();          // On instancie une ligne du tableau avec ListViewItem
                     row.Text = (i+1).ToString();                    // Row prend sa position dans le Dictionary du panier
                     row.SubItems.Add(articles[i].name);             // Row prend le nom de l'article
-                    row.SubItems.Add(articles[i].price + " €");     // Row prend le prix de l'article
+                    row.SubItems.Add(articles[i].totalprice + " €");     // Row prend le prix de l'article
+                    row.SubItems.Add(articles[i].amount.ToString());
                     PanierListView.Items.Add(row);                  // On ajoute la ligne (row) au tableau
                 }
                 else { break; }
@@ -95,47 +121,36 @@ namespace Logiciel_Caisse
         }
 
         // Retourne le texte du ticket de caisse
-        public string CreateTicketText()
+        public string CreateFileText()
         {
             // La variable string ticket qui va contenir le texte du ticket de caisse
 
             // Header :
-            string ticket = $"--------------------------------{System.Environment.NewLine}" +
-                            $"Primeur de la côte{System.Environment.NewLine}" +
-                            $"Avenue de beaurivage{System.Environment.NewLine}" +
-                            $"Kuopio Finland{System.Environment.NewLine}" +
-                            $"le {DateTime.Now.Date.ToString().Split(' ')[0]}{System.Environment.NewLine}" +
-                            $"à {DateTime.Now.ToString("HH:mm")}{System.Environment.NewLine}" +
-                            $"{System.Environment.NewLine}";
+            string ticket = "";
 
             // Boucle dans les articles du panier
             for (int i = 0; i < this.index; i++)
             {
                 // Verification en theorie inutile mais en-cas ¯\_(ツ)_/¯
-                if (articles.ContainsKey(i))
+                if (articlesToExport.ContainsKey(articles[i].name))
                 {
                     // Concatene les informations des articles du panier
-                    ticket += $"{articles[i].name} - {articles[i].weight} kg : {articles[i].price} €{System.Environment.NewLine}";
+                    int amount = articlesToExport[articles[i].name] + articles[i].amount;
+                    ticket += $"{articles[i].name};{amount}{System.Environment.NewLine}";
                 }
-                else { break; }
+                else
+                {
+                    ticket += $"{articles[i].name};{articles[i].amount}{System.Environment.NewLine}";
+                }
             }
-
-            // Footer :
-            ticket += $"{System.Environment.NewLine}" +
-                      $"TOTAL TTC : {Math.Round(montant, 2)} €{System.Environment.NewLine}" +
-                      $"TVA : {Math.Round(montant * 0.2, 2)} €{System.Environment.NewLine}" +
-                      $"{System.Environment.NewLine}" +
-                      $"Merci de votre visite et...{System.Environment.NewLine}" +
-                      $"... Gardez la pêche !{System.Environment.NewLine}" +
-                      $"--------------------------------";
 
             return ticket;
         }
 
         // Cree le fichier ticket.txt avec le texte du ticket de caisse
-        public void CreateTicketFile()
+        public void CreateTotalSalesFile()
         {
-            string ticket = CreateTicketText();                                                         // On stocke le texte du ticket de caisse 
+            string ticket = CreateFileText();                                                         // On stocke le texte du ticket de caisse 
 
             try
             {
@@ -150,16 +165,11 @@ namespace Logiciel_Caisse
 
         }
 
-        // Ouvre le fichier ticket.txt avec le Bloc-notes (notepad.exe)
-        public void ShowTicketFile()
-        {
-            Process.Start("notepad.exe", ticketFileToExport.FullName);
-        }
 
         // Optionnel: permet de supprimer un article (par son index)
         public void DeleteArticle(int index)
         {
-            this.montant -= articles[index].price;      // On retire le prix de l'article du montant
+            this.montant -= articles[index].totalprice;      // On retire le prix de l'article du montant
             this.articles.Remove(index);                // On retire l'article dans le Dictionary
 
             // Le but avec cette boucle est de combler le vide de l'article supprime en decalant tous les articles qui etaient apres celui supprime
@@ -175,7 +185,7 @@ namespace Logiciel_Caisse
             }
 
             this.index--;
-            this.CreateTicketFile();                    // MaJ du fichier ticket.txt
+            this.CreateTotalSalesFile();                    // MaJ du fichier ticket.txt
         }
 
         // Fonction de debug: print le contenu du panier dans la console de Debug
@@ -183,7 +193,7 @@ namespace Logiciel_Caisse
         {
             foreach(KeyValuePair<int, Article> article in articles)
             {
-                Debug.WriteLine($"PANIER => Article: {article.Key}, Name: {article.Value.name}, Price: {article.Value.price}");
+                Debug.WriteLine($"PANIER => Article: {article.Key}, Name: {article.Value.name}, Price: {article.Value.totalprice}");
             }
         }
     }

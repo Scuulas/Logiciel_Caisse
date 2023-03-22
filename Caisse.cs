@@ -28,7 +28,6 @@ namespace Logiciel_Caisse
             if (bdd.GetDB().Count == 0)
             {
                 AddArticle.Enabled = !AddArticle.Enabled;                                           
-                TicketButton.Enabled = !TicketButton.Enabled;
                 DeleteButton.Enabled = !DeleteButton.Enabled;
                 DeleteBasket.Enabled = !DeleteBasket.Enabled;
                 PayButton.Enabled = !PayButton.Enabled;
@@ -71,15 +70,9 @@ namespace Logiciel_Caisse
             // Si l'article existe dans la BDD et que le poids > 0
             if (this.bdd.IsInDB(VegetableComboBox.Text) && WeightUpDown.Value > 0)
             {
-                this.panier.AddArticle(VegetableComboBox.Text, bdd.GetPrice(VegetableComboBox.Text), Convert.ToDouble(WeightUpDown.Value), 1); // Ajoute l'article dans le panier
+                this.panier.AddArticle(VegetableComboBox.Text, bdd.GetPrice(VegetableComboBox.Text), Convert.ToInt32(WeightUpDown.Value)); // Ajoute l'article dans le panier
                 this.InterfaceUpdate();                                                                                                     // MaJ de l'interface
             }
-        }
-
-        // Ouvre le fichier ticket.txt avec Bloc-notes (notepad.exe)
-        private void TicketButton_Click(object sender, EventArgs e)
-        {
-            if (this.panier.GetIndex() > 0) this.panier.ShowTicketFile();   // Si le panier n'est pas vide => Genere puis ouvre le ticket de caisse
         }
 
         // Supprime un article du panier
@@ -107,15 +100,10 @@ namespace Logiciel_Caisse
         // Cree un ticket.txt, ouvre une fenetre Ticket, vide le panier et met a jour l'affichage
         private void PayButton_Click(object sender, EventArgs e)
         {
+            this.panier.CreateTotalSalesFile();
             // Si le panier n'est pas vide
             if (panier.GetIndex() > 0)
             {
-                Ticket ticketWindow = new Ticket(panier.CreateTicketText());    // Cree une classe Ticket avec en parametre le texte du ticket de caisse
-                ticketWindow.StartPosition = FormStartPosition.Manual;          // Parametre pour choisir les coordonnees de lancement de la fenetre manuellement
-                Point location = this.Location;                                 // Coordonnees de la fenetre Caisse
-                ticketWindow.Location = location;                               // Changement de coordonnees de la fenetre Ticket
-                ticketWindow.ShowDialog();                                      // Lance la fenetre Ticket
-
                 this.panier = new Panier();                                     // Efface le panier
                 this.InterfaceUpdate();                                         // MaJ de l'interface
             }
