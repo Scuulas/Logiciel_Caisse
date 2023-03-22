@@ -5,19 +5,30 @@ using System.Diagnostics;
 
 namespace Logiciel_Caisse
 {
+    internal class Pair
+    {
+        public int amount;  
+        public double price;
+
+        public Pair(int amount, double price)
+        {
+            this.amount = amount;
+            this.price = price;
+        }
+    }
     internal class DataBase
     {
         // Attribut DB contenant les noms et les prix des articles de la BDD
-        private readonly Dictionary<string, double> DB;
+        private readonly Dictionary<string, Pair> DB;
 
         // Constructeur
         public DataBase()
         {
-            this.DB = new Dictionary<string, double>();
+            this.DB = new Dictionary<string, Pair>();
         }
 
         // Retourne le dictionnaire DB
-        public Dictionary<string, double> GetDB()
+        public Dictionary<string, Pair> GetDB()
         {
             return this.DB;
         }
@@ -30,7 +41,7 @@ namespace Logiciel_Caisse
             // Dans un try/catch en cas si l'article n'existe pas
             try
             {
-                price = this.DB[vegetable];
+                price = this.DB[vegetable].price;
             }
             catch (Exception ex)
             {
@@ -62,11 +73,13 @@ namespace Logiciel_Caisse
                     string[] vegetableAndPrice = line.Split(';');       // On parse la ligne par des ; pour obtenir une liste avec le nom et le prix
 
                     // Si l'article n'existe pas deja dans la BDD, on l'ajoute
-                    if (!IsInDB(vegetableAndPrice[0])) this.DB.Add(vegetableAndPrice[0], Convert.ToDouble(vegetableAndPrice[1]));
+                    if ((!IsInDB(vegetableAndPrice[0])) && (Convert.ToInt32(vegetableAndPrice[2])>0))
+                    { 
+                        this.DB.Add(vegetableAndPrice[0], new Pair(Convert.ToInt32(vegetableAndPrice[2]),Convert.ToDouble(vegetableAndPrice[1])));
+                    }
                 }
 
                 reader.Close();                                         // On ferme le stream du lecteur
-
             }
             catch (Exception e)
             {
@@ -74,11 +87,10 @@ namespace Logiciel_Caisse
                 Console.WriteLine(e.Message);
             }
         }
-
         // Fonction de debug: print le contenu de DB dans la console de Debug
         public void DebugPrintDB()
         {
-            foreach (KeyValuePair<string, double> article in DB)
+            foreach (KeyValuePair<string, Pair> article in DB)
             {
                 Debug.WriteLine($"DB => Article: {article.Key}, Price: {article.Value}");
             }

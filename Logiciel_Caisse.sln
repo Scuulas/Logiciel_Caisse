@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logiciel_Caisse", "Logiciel_Caisse.csproj", "{80D70E2F-EA24-4A5E-BB6C-33D7BAA19827}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductMaintentance", "..\..\..\Documents\Studium\Savonia\UserInterface\ProductMaintentance\ProductMaintentance\ProductMaintentance.csproj", "{17F37F97-F321-44F5-8C86-8C06BD8B5771}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{80D70E2F-EA24-4A5E-BB6C-33D7BAA19827}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80D70E2F-EA24-4A5E-BB6C-33D7BAA19827}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80D70E2F-EA24-4A5E-BB6C-33D7BAA19827}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17F37F97-F321-44F5-8C86-8C06BD8B5771}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17F37F97-F321-44F5-8C86-8C06BD8B5771}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17F37F97-F321-44F5-8C86-8C06BD8B5771}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17F37F97-F321-44F5-8C86-8C06BD8B5771}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

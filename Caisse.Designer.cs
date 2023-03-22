@@ -56,7 +56,7 @@ namespace Logiciel_Caisse
             // ChooseDB
             // 
             this.ChooseDB.Location = new System.Drawing.Point(47, 66);
-            this.ChooseDB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChooseDB.Margin = new System.Windows.Forms.Padding(4);
             this.ChooseDB.Name = "ChooseDB";
             this.ChooseDB.Size = new System.Drawing.Size(307, 31);
             this.ChooseDB.TabIndex = 0;
@@ -77,9 +77,9 @@ namespace Logiciel_Caisse
             this.vegetableLabel.Location = new System.Drawing.Point(47, 134);
             this.vegetableLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.vegetableLabel.Name = "vegetableLabel";
-            this.vegetableLabel.Size = new System.Drawing.Size(110, 16);
+            this.vegetableLabel.Size = new System.Drawing.Size(118, 16);
             this.vegetableLabel.TabIndex = 2;
-            this.vegetableLabel.Text = "Choisir un article :";
+            this.vegetableLabel.Text = "Choose an Article :";
             // 
             // weightLabel
             // 
@@ -87,16 +87,16 @@ namespace Logiciel_Caisse
             this.weightLabel.Location = new System.Drawing.Point(47, 191);
             this.weightLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.weightLabel.Name = "weightLabel";
-            this.weightLabel.Size = new System.Drawing.Size(74, 16);
+            this.weightLabel.Size = new System.Drawing.Size(58, 16);
             this.weightLabel.TabIndex = 3;
-            this.weightLabel.Text = "Poids (kg) :";
+            this.weightLabel.Text = "Amount :";
             // 
             // VegetableComboBox
             // 
             this.VegetableComboBox.Enabled = false;
             this.VegetableComboBox.FormattingEnabled = true;
             this.VegetableComboBox.Location = new System.Drawing.Point(215, 130);
-            this.VegetableComboBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.VegetableComboBox.Margin = new System.Windows.Forms.Padding(4);
             this.VegetableComboBox.Name = "VegetableComboBox";
             this.VegetableComboBox.Size = new System.Drawing.Size(137, 24);
             this.VegetableComboBox.TabIndex = 4;
@@ -109,7 +109,7 @@ namespace Logiciel_Caisse
             this.AddArticle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddArticle.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.AddArticle.Location = new System.Drawing.Point(47, 241);
-            this.AddArticle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.AddArticle.Margin = new System.Windows.Forms.Padding(4);
             this.AddArticle.Name = "AddArticle";
             this.AddArticle.Size = new System.Drawing.Size(307, 31);
             this.AddArticle.TabIndex = 6;
@@ -127,7 +127,7 @@ namespace Logiciel_Caisse
             0,
             65536});
             this.WeightUpDown.Location = new System.Drawing.Point(215, 188);
-            this.WeightUpDown.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.WeightUpDown.Margin = new System.Windows.Forms.Padding(4);
             this.WeightUpDown.Name = "WeightUpDown";
             this.WeightUpDown.Size = new System.Drawing.Size(139, 22);
             this.WeightUpDown.TabIndex = 7;
@@ -158,7 +158,7 @@ namespace Logiciel_Caisse
             // 
             this.MontantTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.MontantTextBox.Location = new System.Drawing.Point(581, 279);
-            this.MontantTextBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MontantTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.MontantTextBox.Name = "MontantTextBox";
             this.MontantTextBox.ReadOnly = true;
             this.MontantTextBox.Size = new System.Drawing.Size(60, 15);
@@ -170,7 +170,7 @@ namespace Logiciel_Caisse
             // 
             this.TicketButton.Enabled = false;
             this.TicketButton.Location = new System.Drawing.Point(383, 311);
-            this.TicketButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TicketButton.Margin = new System.Windows.Forms.Padding(4);
             this.TicketButton.Name = "TicketButton";
             this.TicketButton.Size = new System.Drawing.Size(129, 39);
             this.TicketButton.TabIndex = 16;
@@ -225,7 +225,7 @@ namespace Logiciel_Caisse
             this.price});
             this.PanierListView.HideSelection = false;
             this.PanierListView.Location = new System.Drawing.Point(383, 66);
-            this.PanierListView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PanierListView.Margin = new System.Windows.Forms.Padding(4);
             this.PanierListView.Name = "PanierListView";
             this.PanierListView.Size = new System.Drawing.Size(283, 203);
             this.PanierListView.TabIndex = 22;
@@ -234,18 +234,18 @@ namespace Logiciel_Caisse
             // 
             // n
             // 
-            this.n.Text = "n°";
-            this.n.Width = 26;
+            this.n.Text = "no";
+            this.n.Width = 33;
             // 
             // article
             // 
-            this.article.Text = "Article";
+            this.article.Text = "article";
             this.article.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.article.Width = 112;
             // 
             // price
             // 
-            this.price.Text = "Prix";
+            this.price.Text = "price";
             this.price.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.price.Width = 71;
             // 
@@ -256,7 +256,7 @@ namespace Logiciel_Caisse
             this.DeleteBasket.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.DeleteBasket.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DeleteBasket.Location = new System.Drawing.Point(47, 311);
-            this.DeleteBasket.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DeleteBasket.Margin = new System.Windows.Forms.Padding(4);
             this.DeleteBasket.Name = "DeleteBasket";
             this.DeleteBasket.Size = new System.Drawing.Size(120, 39);
             this.DeleteBasket.TabIndex = 23;
@@ -286,7 +286,7 @@ namespace Logiciel_Caisse
             this.Controls.Add(this.vegetableLabel);
             this.Controls.Add(this.ChooseDB);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(727, 420);
             this.MinimizeBox = false;
