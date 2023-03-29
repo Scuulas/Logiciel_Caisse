@@ -71,6 +71,9 @@ namespace Logiciel_Caisse
             this.receiptFileToExport = new FileInfo(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + "_Receipts" + "\\" + receiptCounter.ToString() + ".txt");
         }
 
+
+
+
         // Getters des attributs montant et index
         public double GetMontant() { 
             double sum = 0;
@@ -90,6 +93,16 @@ namespace Logiciel_Caisse
             this.articles.Add(index, new Article(name, price, amount, Math.Round(amount * price, 2)));
             this.montant += Math.Round(amount * price, 2);
             this.index++;
+        }
+
+        public string GetArticleFromBasketIndex(int basketIndex)
+        {
+            return articles[basketIndex].name;
+        }
+
+        public int GetAmount(int basketIndex)
+        {
+            return articles[basketIndex].amount;
         }
 
         // Retourne une liste contenant tous les numeros des indexes d'un panier (pour le ComboBox)

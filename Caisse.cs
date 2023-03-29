@@ -10,6 +10,7 @@ namespace Logiciel_Caisse
         // Attributs
         private readonly DataBase bdd;
         private Panier panier;
+        private String pathDB;
 
         // Constructeur
         public Caisse()
@@ -59,7 +60,8 @@ namespace Logiciel_Caisse
         private void OpenDB_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.EnableButtons();                                           // Active les boutons
-            this.bdd.ImportDBfromFile(open_DB.FileName);                    // Importe dans le contenu du fichier .csv dans l'objet bdd
+            this.pathDB = open_DB.FileName;
+            this.bdd.ImportDBfromFile(pathDB);                    // Importe dans le contenu du fichier .csv dans l'objet bdd
             VegetableComboBox.Items.Clear();                                // Clear de la ComboBox de l'article
             VegetableComboBox.Items.AddRange(bdd.GetDB().Keys.ToArray());   // MaJ des articles dans la ComboBox
         }
@@ -70,8 +72,18 @@ namespace Logiciel_Caisse
             // Si l'article existe dans la BDD et que le poids > 0
             if (this.bdd.IsInDB(VegetableComboBox.Text) && WeightUpDown.Value > 0)
             {
-                this.panier.AddArticle(VegetableComboBox.Text, bdd.GetPrice(VegetableComboBox.Text), Convert.ToInt32(WeightUpDown.Value)); // Ajoute l'article dans le panier
-                this.InterfaceUpdate();                                                                                                     // MaJ de l'interface
+                if ((this.bdd.GetAmount(VegetableComboBox.Text) - WeightUpDown.Value) >= 0)
+                {
+                    this.panier.AddArticle(VegetableComboBox.Text, bdd.GetPrice(VegetableComboBox.Text), Convert.ToInt32(WeightUpDown.Value)); // Ajoute l'article dans le panier
+                    this.bdd.ChangeAmountAsSum(VegetableComboBox.Text,-Convert.ToInt32(WeightUpDown.Value));
+                    this.InterfaceUpdate();
+                }
+                else
+                {
+                    string message = "Not enough articles left!";
+                    string title = "Error";
+                    MessageBox.Show(message, title);
+                }
             }
         }
 
@@ -81,9 +93,11 @@ namespace Logiciel_Caisse
             // Si un numero est selectionne dans la ComboBox
             if (ArticleNumberComboBox.SelectedIndex != -1)
             {
+                int selectedIndex = Convert.ToInt32(ArticleNumberComboBox.Text) - 1;
                 // Si le numero est dans la range des articles du panier
-                if (panier.IsInBasketRange(Convert.ToInt32(ArticleNumberComboBox.Text) - 1))
+                if (panier.IsInBasketRange(selectedIndex))
                 {
+                    this.bdd.ChangeAmountAsSum(this.panier.GetArticleFromBasketIndex(selectedIndex),this.panier.GetAmount(selectedIndex));
                     this.panier.DeleteArticle(Convert.ToInt32(ArticleNumberComboBox.Text) - 1); // Supprime l'article
                     this.InterfaceUpdate();                                                     // MaJ de l'interface
                 }
@@ -93,6 +107,10 @@ namespace Logiciel_Caisse
         // Vide le panier et met a jour l'affichage
         private void DeleteBasket_Click(object sender, EventArgs e)
         {
+            for (int i = 0; i < this.panier.GetIndex(); i++) 
+            {
+                this.bdd.ChangeAmountAsSum(this.panier.GetArticleFromBasketIndex(i), this.panier.GetAmount(i));
+            }
             this.panier = new Panier();     // Ecrase le panier par un nouveau
             this.InterfaceUpdate();         // MaJ de l'interface
         }
@@ -108,6 +126,10 @@ namespace Logiciel_Caisse
                 // Si le panier n'est pas vide
                 if (panier.GetIndex() > 0)
                 {
+                    bdd.ExportToFile(pathDB);
+                    bdd.ImportDBfromFile(pathDB);
+                    VegetableComboBox.Items.Clear();                                // Clear de la ComboBox de l'article
+                    VegetableComboBox.Items.AddRange(bdd.GetDB().Keys.ToArray());   // MaJ des articles dans la ComboBox
                     Ticket ticketWindow = new Ticket(panier.CreateReceiptText(sum));    // Cree une classe Ticket avec en parametre le texte du ticket de caisse
                     ticketWindow.StartPosition = FormStartPosition.Manual;          // Parametre pour choisir les coordonnees de lancement de la fenetre manuellement
                     Point location = this.Location;                                 // Coordonnees de la fenetre Caisse

@@ -20,17 +20,38 @@ namespace Logiciel_Caisse
     {
         // Attribut DB contenant les noms et les prix des articles de la BDD
         private readonly Dictionary<string, Pair> DB;
+        private readonly Dictionary<string, Pair> DBemptyArticles;
 
         // Constructeur
         public DataBase()
         {
             this.DB = new Dictionary<string, Pair>();
+            this.DBemptyArticles = new Dictionary<string, Pair>();
         }
 
         // Retourne le dictionnaire DB
         public Dictionary<string, Pair> GetDB()
         {
             return this.DB;
+        }
+
+        public int GetAmount(string article) 
+        {
+            int amount = 0;
+            try
+            {
+                amount = this.DB[article].amount;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return amount;
+        }
+
+        public void ChangeAmountAsSum(string article, int newAmount) 
+        {
+            this.DB[article].amount += newAmount;
         }
 
         // Retourne le prix d'un article en renseignant le nom de celui-ci
@@ -60,6 +81,7 @@ namespace Logiciel_Caisse
         // Importe les donnees d'un fichier .csv dans DB
         public void ImportDBfromFile(string fileToImport)
         {
+            this.DB.Clear();
             try
             {
                 StreamReader reader = new StreamReader(fileToImport);   // On ouvre un stream pour lire le fichier
@@ -77,6 +99,10 @@ namespace Logiciel_Caisse
                     { 
                         this.DB.Add(vegetableAndPrice[0], new Pair(Convert.ToInt32(vegetableAndPrice[2]),Convert.ToDouble(vegetableAndPrice[1])));
                     }
+                    else
+                    {
+                        this.DBemptyArticles.Add(vegetableAndPrice[0], new Pair(Convert.ToInt32(vegetableAndPrice[2]), Convert.ToDouble(vegetableAndPrice[1])));
+                    }
                 }
 
                 reader.Close();                                         // On ferme le stream du lecteur
@@ -86,6 +112,20 @@ namespace Logiciel_Caisse
                 Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
             }
+        }
+
+        public void ExportToFile(string file) 
+        {
+            List<String> lines = new List<String>();
+            foreach (var article in DB)
+            {
+                lines.Add($"{article.Key};{article.Value.price};{article.Value.amount}");
+            }
+            foreach (var article in DBemptyArticles)
+            {
+                lines.Add($"{article.Key};{article.Value.price};{article.Value.amount}");
+            }
+            File.WriteAllLines(file, lines.ToArray());
         }
         // Fonction de debug: print le contenu de DB dans la console de Debug
         public void DebugPrintDB()
