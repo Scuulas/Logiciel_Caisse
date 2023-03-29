@@ -154,11 +154,11 @@ namespace Logiciel_Caisse
             this.MontantTextBox.Location = new System.Drawing.Point(581, 279);
             this.MontantTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.MontantTextBox.Name = "MontantTextBox";
-            this.MontantTextBox.ReadOnly = true;
             this.MontantTextBox.Size = new System.Drawing.Size(60, 15);
             this.MontantTextBox.TabIndex = 12;
             this.MontantTextBox.Text = "0";
             this.MontantTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.MontantTextBox.TextChanged += new System.EventHandler(this.MontantTextBox_TextChanged);
             // 
             // PayButton
             // 

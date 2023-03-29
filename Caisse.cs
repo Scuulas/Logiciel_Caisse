@@ -100,13 +100,47 @@ namespace Logiciel_Caisse
         // Cree un ticket.txt, ouvre une fenetre Ticket, vide le panier et met a jour l'affichage
         private void PayButton_Click(object sender, EventArgs e)
         {
-            this.panier.CreateTotalSalesFile();
-            // Si le panier n'est pas vide
-            if (panier.GetIndex() > 0)
+            if (MontantTextBox.Text != "")
             {
-                this.panier = new Panier();                                     // Efface le panier
-                this.InterfaceUpdate();                                         // MaJ de l'interface
+                double sum = Convert.ToDouble(MontantTextBox.Text);
+                this.panier.CreateTotalSalesFile();
+                this.panier.CreateReceiptFile(Convert.ToDouble(sum));
+                // Si le panier n'est pas vide
+                if (panier.GetIndex() > 0)
+                {
+                    Ticket ticketWindow = new Ticket(panier.CreateReceiptText(sum));    // Cree une classe Ticket avec en parametre le texte du ticket de caisse
+                    ticketWindow.StartPosition = FormStartPosition.Manual;          // Parametre pour choisir les coordonnees de lancement de la fenetre manuellement
+                    Point location = this.Location;                                 // Coordonnees de la fenetre Caisse
+                    ticketWindow.Location = location;                               // Changement de coordonnees de la fenetre Ticket
+                    ticketWindow.ShowDialog();
+
+                    this.panier = new Panier();                                     // Efface le panier
+                    this.InterfaceUpdate();                                         // MaJ de l'interface
+                }
             }
+            else
+            {
+                string message = "Type a total Price";
+                string title = "Error!";
+                MessageBox.Show(message, title);
+            }
+        }
+
+        private void MontantTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (!IsDoubleRealNumber(MontantTextBox.Text) && MontantTextBox.Text != ""){
+                MontantTextBox.Text = this.panier.GetMontant().ToString();
+            }
+        }
+
+        private static bool IsDoubleRealNumber(string valueToTest)
+        {
+            if (double.TryParse(valueToTest, out double d) && !Double.IsNaN(d) && !Double.IsInfinity(d))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

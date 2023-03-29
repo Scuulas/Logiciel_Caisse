@@ -31,7 +31,8 @@ namespace Logiciel_Caisse
         private double montant;                                                         // Montant total du panier
         private readonly Dictionary<int, Article> articles;                             // Structure pour contenir tous les articles dans le panier
         private int index;                                                              // Index: nombre d'articles dans le panier
-        private FileInfo ticketFileToExport;     // Creation de la variable FileInfo pour pouvoir ecrire dans un fichier
+        private FileInfo ticketFileToExport;                                            // Creation de la variable FileInfo pour pouvoir ecrire dans un fichier
+        private FileInfo receiptFileToExport;
         private Dictionary<string, int> articlesToExport;
         // Constructeur
         public Panier()
@@ -44,7 +45,7 @@ namespace Logiciel_Caisse
             this.ticketFileToExport = new FileInfo(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + ".csv");
             if (!this.ticketFileToExport.Exists)
             {
-                Directory.CreateDirectory(now.ToString("yyyy") + "\\" + now.ToString("MM"));    
+                Directory.CreateDirectory(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + "_Receipts");    
             }
             else
             {
@@ -66,10 +67,21 @@ namespace Logiciel_Caisse
                     Console.WriteLine(e.Message);
                 }
             }
+            int receiptCounter = Directory.GetFiles(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + "_Receipts", "*", SearchOption.AllDirectories).Length;
+            this.receiptFileToExport = new FileInfo(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + "_Receipts" + "\\" + receiptCounter.ToString() + ".txt");
         }
 
         // Getters des attributs montant et index
-        public double GetMontant() { return this.montant;  }
+        public double GetMontant() { 
+            double sum = 0;
+            foreach(var article in this.articles)
+            {
+                sum += article.Value.totalprice;
+            }
+            Math.Round(sum, 2);
+            this.montant = sum;
+            return this.montant;  
+        }
         public int GetIndex() { return this.index; }
 
         // Ajout d'un article dans le panier (le Dictionary articles), ajoute le prix au montant total et incremente this.index
@@ -137,11 +149,16 @@ namespace Logiciel_Caisse
                     // Concatene les informations des articles du panier
                     int amount = articlesToExport[articles[i].name] + articles[i].amount;
                     ticket += $"{articles[i].name};{amount}{System.Environment.NewLine}";
+                    articlesToExport.Remove(articles[i].name);
                 }
                 else
                 {
                     ticket += $"{articles[i].name};{articles[i].amount}{System.Environment.NewLine}";
                 }
+            }
+            foreach( var article in articlesToExport)
+            {
+                ticket += $"{article.Key};{article.Value}{System.Environment.NewLine}";
             }
 
             return ticket;
@@ -154,7 +171,7 @@ namespace Logiciel_Caisse
 
             try
             {
-                StreamWriter writer = new StreamWriter(ticketFileToExport.Open(FileMode.Truncate));     // On ouvre le stream pour ecrire sur le fichier ticket.txt
+                StreamWriter writer = new StreamWriter(ticketFileToExport.OpenWrite());     // On ouvre le stream pour ecrire sur le fichier ticket.txt
                 writer.Write(ticket);                                                                   // On ecrite le texte dans le fichier
                 writer.Close();                                                                         // On ferme le stream
             }
@@ -163,6 +180,56 @@ namespace Logiciel_Caisse
                 MessageBox.Show("Exception: " + e.Message);
             }
 
+        }
+
+        public string CreateReceiptText(double sum)
+        {
+            // La variable string ticket qui va contenir le texte du ticket de caisse
+            // Header :
+            string ticket = $"TOTAL : {Math.Round(sum, 2)} €{System.Environment.NewLine}" +
+                            $"--------------------------------{System.Environment.NewLine}" +
+                            $"Receipt{System.Environment.NewLine}" +
+                            $"{System.Environment.NewLine}" +
+                            $"from {DateTime.Now.Date.ToString().Split(' ')[0]}{System.Environment.NewLine}" +
+                            $"at {DateTime.Now.ToString("HH:mm")}{System.Environment.NewLine}" +
+                            $"For buying this articles:{System.Environment.NewLine}" +
+                            $"{System.Environment.NewLine}";
+
+            // Boucle dans les articles du panier
+            for (int i = 0; i < this.index; i++)
+            {
+                // Verification en theorie inutile mais en-cas ¯\_(ツ)_/¯
+                if (articles.ContainsKey(i))
+                {
+                    // Concatene les informations des articles du panier
+                    ticket += $"{articles[i].name} - {articles[i].amount} pcs : {articles[i].price} €{System.Environment.NewLine}";
+                }
+                else { break; }
+            }
+
+            // Footer :
+            ticket += $"{System.Environment.NewLine}" +
+                      $"Thanks for visiting{System.Environment.NewLine}" +
+                      $"--------------------------------";
+
+            return ticket;
+        }
+
+        public void CreateReceiptFile(double sum)
+        {
+            string ticket = CreateReceiptText(sum);
+            
+
+            try
+            {
+                StreamWriter writer = new StreamWriter(receiptFileToExport.OpenWrite());     // On ouvre le stream pour ecrire sur le fichier ticket.txt
+                writer.Write(ticket);                                                                   // On ecrite le texte dans le fichier
+                writer.Close();                                                                         // On ferme le stream
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Exception: " + e.Message);
+            }
         }
 
 
@@ -184,8 +251,7 @@ namespace Logiciel_Caisse
                 }
             }
 
-            this.index--;
-            this.CreateTotalSalesFile();                    // MaJ du fichier ticket.txt
+            this.index--;                   
         }
 
         // Fonction de debug: print le contenu du panier dans la console de Debug
