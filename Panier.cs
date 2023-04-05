@@ -42,7 +42,12 @@ namespace Logiciel_Caisse
             this.index = 0;
             this.articles = new Dictionary<int, Article>();
             this.articlesToExport = new Dictionary<string, int>();
-            this.ticketFileToExport = new FileInfo(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + ".csv");
+            this.ticketFileToExport = new FileInfo("Dailys" + "\\" + now.ToString("yyyyMMdd")  + ".csv");
+            if (!Directory.Exists("Dailys"))
+            {
+                Directory.CreateDirectory("Dailys");
+            }
+            
             if (!this.ticketFileToExport.Exists)
             {
                 Directory.CreateDirectory(now.ToString("yyyy") + "\\" + now.ToString("MM") + "\\" + now.ToString("dd") + "_Receipts");    
