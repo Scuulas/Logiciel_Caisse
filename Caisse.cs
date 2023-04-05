@@ -10,6 +10,7 @@ namespace Logiciel_Caisse
         // Attributs
         private readonly DataBase bdd;
         private Panier panier;
+        private String pathDB;
 
         // Constructeur
         public Caisse()
@@ -28,7 +29,6 @@ namespace Logiciel_Caisse
             if (bdd.GetDB().Count == 0)
             {
                 AddArticle.Enabled = !AddArticle.Enabled;                                           
-                TicketButton.Enabled = !TicketButton.Enabled;
                 DeleteButton.Enabled = !DeleteButton.Enabled;
                 DeleteBasket.Enabled = !DeleteBasket.Enabled;
                 PayButton.Enabled = !PayButton.Enabled;
@@ -60,7 +60,8 @@ namespace Logiciel_Caisse
         private void OpenDB_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.EnableButtons();                                           // Active les boutons
-            this.bdd.ImportDBfromFile(open_DB.FileName);                    // Importe dans le contenu du fichier .csv dans l'objet bdd
+            this.pathDB = open_DB.FileName;
+            this.bdd.ImportDBfromFile(pathDB);                    // Importe dans le contenu du fichier .csv dans l'objet bdd
             VegetableComboBox.Items.Clear();                                // Clear de la ComboBox de l'article
             VegetableComboBox.Items.AddRange(bdd.GetDB().Keys.ToArray());   // MaJ des articles dans la ComboBox
         }
@@ -71,15 +72,19 @@ namespace Logiciel_Caisse
             // Si l'article existe dans la BDD et que le poids > 0
             if (this.bdd.IsInDB(VegetableComboBox.Text) && WeightUpDown.Value > 0)
             {
-                this.panier.AddArticle(VegetableComboBox.Text, bdd.GetPrice(VegetableComboBox.Text), Convert.ToDouble(WeightUpDown.Value), 1); // Ajoute l'article dans le panier
-                this.InterfaceUpdate();                                                                                                     // MaJ de l'interface
+                if ((this.bdd.GetAmount(VegetableComboBox.Text) - WeightUpDown.Value) >= 0)
+                {
+                    this.panier.AddArticle(VegetableComboBox.Text, bdd.GetPrice(VegetableComboBox.Text), Convert.ToInt32(WeightUpDown.Value)); // Ajoute l'article dans le panier
+                    this.bdd.ChangeAmountAsSum(VegetableComboBox.Text,-Convert.ToInt32(WeightUpDown.Value));
+                    this.InterfaceUpdate();
+                }
+                else
+                {
+                    string message = "Not enough articles left!";
+                    string title = "Error";
+                    MessageBox.Show(message, title);
+                }
             }
-        }
-
-        // Ouvre le fichier ticket.txt avec Bloc-notes (notepad.exe)
-        private void TicketButton_Click(object sender, EventArgs e)
-        {
-            if (this.panier.GetIndex() > 0) this.panier.ShowTicketFile();   // Si le panier n'est pas vide => Genere puis ouvre le ticket de caisse
         }
 
         // Supprime un article du panier
@@ -88,9 +93,11 @@ namespace Logiciel_Caisse
             // Si un numero est selectionne dans la ComboBox
             if (ArticleNumberComboBox.SelectedIndex != -1)
             {
+                int selectedIndex = Convert.ToInt32(ArticleNumberComboBox.Text) - 1;
                 // Si le numero est dans la range des articles du panier
-                if (panier.IsInBasketRange(Convert.ToInt32(ArticleNumberComboBox.Text) - 1))
+                if (panier.IsInBasketRange(selectedIndex))
                 {
+                    this.bdd.ChangeAmountAsSum(this.panier.GetArticleFromBasketIndex(selectedIndex),this.panier.GetAmount(selectedIndex));
                     this.panier.DeleteArticle(Convert.ToInt32(ArticleNumberComboBox.Text) - 1); // Supprime l'article
                     this.InterfaceUpdate();                                                     // MaJ de l'interface
                 }
@@ -100,6 +107,10 @@ namespace Logiciel_Caisse
         // Vide le panier et met a jour l'affichage
         private void DeleteBasket_Click(object sender, EventArgs e)
         {
+            for (int i = 0; i < this.panier.GetIndex(); i++) 
+            {
+                this.bdd.ChangeAmountAsSum(this.panier.GetArticleFromBasketIndex(i), this.panier.GetAmount(i));
+            }
             this.panier = new Panier();     // Ecrase le panier par un nouveau
             this.InterfaceUpdate();         // MaJ de l'interface
         }
@@ -107,18 +118,51 @@ namespace Logiciel_Caisse
         // Cree un ticket.txt, ouvre une fenetre Ticket, vide le panier et met a jour l'affichage
         private void PayButton_Click(object sender, EventArgs e)
         {
-            // Si le panier n'est pas vide
-            if (panier.GetIndex() > 0)
+            if (MontantTextBox.Text != "")
             {
-                Ticket ticketWindow = new Ticket(panier.CreateTicketText());    // Cree une classe Ticket avec en parametre le texte du ticket de caisse
-                ticketWindow.StartPosition = FormStartPosition.Manual;          // Parametre pour choisir les coordonnees de lancement de la fenetre manuellement
-                Point location = this.Location;                                 // Coordonnees de la fenetre Caisse
-                ticketWindow.Location = location;                               // Changement de coordonnees de la fenetre Ticket
-                ticketWindow.ShowDialog();                                      // Lance la fenetre Ticket
+                double sum = Convert.ToDouble(MontantTextBox.Text);
+                this.panier.CreateTotalSalesFile();
+                this.panier.CreateReceiptFile(Convert.ToDouble(sum));
+                // Si le panier n'est pas vide
+                if (panier.GetIndex() > 0)
+                {
+                    bdd.ExportToFile(pathDB);
+                    bdd.ImportDBfromFile(pathDB);
+                    VegetableComboBox.Items.Clear();                                // Clear de la ComboBox de l'article
+                    VegetableComboBox.Items.AddRange(bdd.GetDB().Keys.ToArray());   // MaJ des articles dans la ComboBox
+                    Ticket ticketWindow = new Ticket(panier.CreateReceiptText(sum));    // Cree une classe Ticket avec en parametre le texte du ticket de caisse
+                    ticketWindow.StartPosition = FormStartPosition.Manual;          // Parametre pour choisir les coordonnees de lancement de la fenetre manuellement
+                    Point location = this.Location;                                 // Coordonnees de la fenetre Caisse
+                    ticketWindow.Location = location;                               // Changement de coordonnees de la fenetre Ticket
+                    ticketWindow.ShowDialog();
 
-                this.panier = new Panier();                                     // Efface le panier
-                this.InterfaceUpdate();                                         // MaJ de l'interface
+                    this.panier = new Panier();                                     // Efface le panier
+                    this.InterfaceUpdate();                                         // MaJ de l'interface
+                }
             }
+            else
+            {
+                string message = "Type a total Price";
+                string title = "Error!";
+                MessageBox.Show(message, title);
+            }
+        }
+
+        private void MontantTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (!IsDoubleRealNumber(MontantTextBox.Text) && MontantTextBox.Text != ""){
+                MontantTextBox.Text = this.panier.GetMontant().ToString();
+            }
+        }
+
+        private static bool IsDoubleRealNumber(string valueToTest)
+        {
+            if (double.TryParse(valueToTest, out double d) && !Double.IsNaN(d) && !Double.IsInfinity(d))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
